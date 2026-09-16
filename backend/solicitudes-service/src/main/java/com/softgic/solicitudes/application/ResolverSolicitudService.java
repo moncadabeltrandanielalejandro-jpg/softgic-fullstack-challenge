@@ -38,7 +38,8 @@ public class ResolverSolicitudService implements ResolverSolicitudUseCase {
 
         try {
             String payload = objectMapper.writeValueAsString(new SolicitudResueltaPayload(
-                    solicitudId.toString(), analistaId.toString(), observacion));
+                solicitudId.toString(), solicitud.getCategoriaId().toString(), analistaId.toString(),
+                solicitud.getEstado().name(), observacion));
             eventPublisher.publicar(DomainEvent.of("SolicitudResuelta", solicitudId.toString(),
                     UUID.randomUUID().toString(), payload));
         } catch (Exception e) {
@@ -46,5 +47,6 @@ public class ResolverSolicitudService implements ResolverSolicitudUseCase {
         }
     }
 
-    private record SolicitudResueltaPayload(String solicitudId, String analistaId, String observacion) {}
+    private record SolicitudResueltaPayload(String solicitudId, String categoriaId, String analistaId,
+                                             String estado, String observacion) {}
 }

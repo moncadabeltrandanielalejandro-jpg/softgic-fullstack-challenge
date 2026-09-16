@@ -53,30 +53,30 @@ public class SolicitudController {
     @GetMapping
     @PreAuthorize("hasAnyRole('SOLICITANTE','ANALISTA','SUPERVISOR')")
     @Operation(summary = "Listar/filtrar solicitudes paginadas")
-    public ResponseEntity<?> listar(@RequestParam(required = false) String estado,
-                                     @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "20") int size,
+    public ResponseEntity<?> listar(@RequestParam(name = "estado", required = false) String estado,
+                                     @RequestParam(name = "page", defaultValue = "0") int page,
+                                     @RequestParam(name = "size", defaultValue = "20") int size,
                                      Authentication authentication) {
         return ResponseEntity.ok(solicitudQueryService.buscar(estado, page, size, authentication));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('SOLICITANTE','ANALISTA','SUPERVISOR')")
-    public ResponseEntity<SolicitudResponse> detalle(@PathVariable UUID id) {
+    public ResponseEntity<SolicitudResponse> detalle(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(solicitudQueryService.obtenerDetalle(id));
     }
 
     @PostMapping("/{id}/asignaciones")
     @PreAuthorize("hasRole('ANALISTA')")
     @Operation(summary = "Tomar una solicitud (A2: solo un analista puede ganar la asignación)")
-    public ResponseEntity<Void> tomar(@PathVariable UUID id, Authentication authentication) {
+    public ResponseEntity<Void> tomar(@PathVariable("id") UUID id, Authentication authentication) {
         tomarSolicitud.ejecutar(id, actorId(authentication));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/transiciones/resolver")
     @PreAuthorize("hasRole('ANALISTA')")
-    public ResponseEntity<Void> resolver(@PathVariable UUID id, @Valid @RequestBody ResolverSolicitudRequest request,
+    public ResponseEntity<Void> resolver(@PathVariable("id") UUID id, @Valid @RequestBody ResolverSolicitudRequest request,
                                           Authentication authentication) {
         resolverSolicitud.ejecutar(id, actorId(authentication), request.observacion());
         return ResponseEntity.ok().build();
@@ -84,7 +84,7 @@ public class SolicitudController {
 
     @PostMapping("/{id}/transiciones/devolver")
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public ResponseEntity<Void> devolver(@PathVariable UUID id, @Valid @RequestBody MotivoRequest request,
+    public ResponseEntity<Void> devolver(@PathVariable("id") UUID id, @Valid @RequestBody MotivoRequest request,
                                           Authentication authentication) {
         gestionarSupervision.devolverAAtencion(id, actorId(authentication), request.motivo());
         return ResponseEntity.ok().build();
@@ -93,7 +93,7 @@ public class SolicitudController {
     @PostMapping("/{id}/transiciones/cerrar")
     @PreAuthorize("hasRole('SUPERVISOR')")
     @Operation(summary = "Cerrar solicitud (A3 valida 403 si el rol no es SUPERVISOR)")
-    public ResponseEntity<Void> cerrar(@PathVariable UUID id, @Valid @RequestBody MotivoRequest request,
+    public ResponseEntity<Void> cerrar(@PathVariable("id") UUID id, @Valid @RequestBody MotivoRequest request,
                                         Authentication authentication) {
         gestionarSupervision.cerrar(id, actorId(authentication), request.motivo());
         return ResponseEntity.ok().build();

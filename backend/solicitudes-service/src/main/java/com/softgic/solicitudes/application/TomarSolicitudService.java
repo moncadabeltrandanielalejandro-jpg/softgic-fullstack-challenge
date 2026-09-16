@@ -41,7 +41,8 @@ public class TomarSolicitudService implements TomarSolicitudUseCase {
 
         try {
             String payload = objectMapper.writeValueAsString(new SolicitudTomadaPayload(
-                    solicitudId.toString(), analistaId.toString(), solicitud.getEstado().name()));
+                solicitudId.toString(), solicitud.getCategoriaId().toString(), analistaId.toString(),
+                solicitud.getEstado().name()));
             eventPublisher.publicar(DomainEvent.of("SolicitudTomada", solicitudId.toString(),
                     UUID.randomUUID().toString(), payload));
         } catch (Exception e) {
@@ -49,5 +50,5 @@ public class TomarSolicitudService implements TomarSolicitudUseCase {
         }
     }
 
-    private record SolicitudTomadaPayload(String solicitudId, String analistaId, String estado) {}
+    private record SolicitudTomadaPayload(String solicitudId, String categoriaId, String analistaId, String estado) {}
 }

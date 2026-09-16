@@ -1,11 +1,28 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081/api/v1';
+const frontendEnv = (import.meta as ImportMeta & { env?: Record<string, string> }).env ?? {};
+const API_BASE_URL = frontendEnv.VITE_API_BASE_URL ?? 'http://localhost:8081/api/v1';
+const INDICADORES_API_BASE_URL = frontendEnv.VITE_INDICADORES_API_BASE_URL ?? 'http://localhost:8082/api/v1';
 
-/** Cliente HTTP mínimo; el token se inyecta desde el shell vía interceptor (pendiente de integrar). */
+declare global {
+  interface Window {
+    __softgicAccessToken?: () => string | undefined;
+  }
+}
+
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  return fetchFromApi<T>(API_BASE_URL, path, init);
+}
+
+export async function indicadoresApiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return fetchFromApi<T>(INDICADORES_API_BASE_URL, path, init);
+}
+
+async function fetchFromApi<T>(baseUrl: string, path: string, init?: RequestInit): Promise<T> {
+  const token = typeof window !== 'undefined' ? window.__softgicAccessToken?.() : undefined;
+  const response = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers,
     },
   });
@@ -16,5 +33,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   if (!response.ok) {
     throw new Error(`Error de API: ${response.status}`);
   }
+  if (response.status === 204) return undefined as T;
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('application/json')) return undefined as T;
   return response.json() as Promise<T>;
 }

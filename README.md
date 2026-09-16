@@ -33,7 +33,7 @@ Ver [docs/modelo-datos.md](docs/modelo-datos.md).
 
 ## Ejecución local
 
-Prerrequisitos: Docker + Docker Compose, JDK 21, Node 20+, pnpm/npm.
+Prerrequisitos: Docker + Docker Compose, JDK 25, Node 20+, pnpm/npm.
 
 ```powershell
 docker compose up --build

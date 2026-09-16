@@ -1,0 +1,13 @@
+.git
+.gitignore
+.idea
+.vscode
+**/target
+**/node_modules
+**/dist
+**/.m2
+*.log
+*.tmp
+backend/.github
+docs
+infra

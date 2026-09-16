@@ -11,7 +11,7 @@ variables:
 # --- Backend ---
 backend:lint:
   stage: lint
-  image: maven:3.9-eclipse-temurin-21
+  image: maven:3.9-eclipse-temurin-25
   script:
     - cd backend && mvn -q -B validate
   rules:
@@ -19,7 +19,7 @@ backend:lint:
 
 backend:test:
   stage: test
-  image: maven:3.9-eclipse-temurin-21
+  image: maven:3.9-eclipse-temurin-25
   script:
     - cd backend && mvn -B test
   artifacts:
@@ -31,7 +31,7 @@ backend:test:
 
 backend:coverage:
   stage: coverage
-  image: maven:3.9-eclipse-temurin-21
+  image: maven:3.9-eclipse-temurin-25
   script:
     - cd backend && mvn -B verify -DskipTests=false
   artifacts:
@@ -76,7 +76,7 @@ frontend:build:
 # --- Karate (contrato/E2E transversal) ---
 karate:test:
   stage: test
-  image: maven:3.9-eclipse-temurin-21
+  image: maven:3.9-eclipse-temurin-25
   script:
     - cd backend/karate-tests && mvn -B test
   rules:

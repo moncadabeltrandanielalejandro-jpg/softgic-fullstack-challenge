@@ -24,11 +24,12 @@ public class SolicitudRepositoryAdapter implements SolicitudRepositoryPort {
         Instant ahora = Instant.now();
         SolicitudEntity existente = jpaRepository.findById(solicitud.getId()).orElse(null);
         Instant creadoEn = existente != null ? existente.getCreadoEn() : ahora;
+        long version = existente != null ? existente.getVersion() : solicitud.getVersion();
 
         SolicitudEntity entity = new SolicitudEntity(
                 solicitud.getId(), solicitud.getCodigo(), solicitud.getAsunto(), solicitud.getDescripcion(),
                 solicitud.getCategoriaId(), solicitud.getPrioridad().name(), solicitud.getEstado().name(),
-                solicitud.getSolicitanteId(), solicitud.getAnalistaId(), creadoEn, ahora, solicitud.getVersion());
+            solicitud.getSolicitanteId(), solicitud.getAnalistaId(), creadoEn, ahora, version);
 
         SolicitudEntity guardada = jpaRepository.save(entity);
         return toDomain(guardada);

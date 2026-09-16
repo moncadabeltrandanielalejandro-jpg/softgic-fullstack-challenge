@@ -17,14 +17,14 @@ services:
       retries: 10
 
   db-init:
-    image: mcr.microsoft.com/mssql-tools18
+    image: mcr.microsoft.com/mssql-tools:latest
     depends_on:
       sqlserver:
         condition: service_healthy
     entrypoint: >
       bash -c "
-      /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"IF DB_ID('$$MSSQL_DB_SOLICITUDES') IS NULL CREATE DATABASE [$$MSSQL_DB_SOLICITUDES]\" &&
-      /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"IF DB_ID('$$MSSQL_DB_INDICADORES') IS NULL CREATE DATABASE [$$MSSQL_DB_INDICADORES]\"
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"IF DB_ID('$$MSSQL_DB_SOLICITUDES') IS NULL CREATE DATABASE [$$MSSQL_DB_SOLICITUDES]\" &&
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"IF DB_ID('$$MSSQL_DB_INDICADORES') IS NULL CREATE DATABASE [$$MSSQL_DB_INDICADORES]\"
       "
     environment:
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-ChangeMe_2026!Local}
@@ -45,7 +45,7 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -77,7 +77,8 @@ services:
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-ChangeMe_2026!Local}
       MSSQL_DB_SOLICITUDES: ${MSSQL_DB_SOLICITUDES:-solicitudes_db}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}
+      KEYCLOAK_ISSUER_URI: http://localhost:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}/protocol/openid-connect/certs
     ports:
       - "8081:8081"
 
@@ -97,7 +98,8 @@ services:
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-ChangeMe_2026!Local}
       MSSQL_DB_INDICADORES: ${MSSQL_DB_INDICADORES:-indicadores_db}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}
+      KEYCLOAK_ISSUER_URI: http://localhost:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-softgic-solicitudes}/protocol/openid-connect/certs
     ports:
       - "8082:8082"
 

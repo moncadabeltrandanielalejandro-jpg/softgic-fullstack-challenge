@@ -1,7 +1,7 @@
-import { CircularProgress, Box } from '@mui/material';
+import { AppBar, Box, Button, CircularProgress, Container, Toolbar, Typography } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Provider, useDispatch } from 'react-redux';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { store } from './store';
 import { initKeycloak, keycloak } from './keycloak';
 import { sesionIniciada } from './features/sesion/sesionSlice';
@@ -28,15 +28,28 @@ function Rutas() {
   }, [dispatch]);
 
   if (error) return <Box role="alert">{error}</Box>;
-  if (!listo) return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;
+  if (!listo) return <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center"><CircularProgress aria-label="Inicializando sesión" /></Box>;
 
   return (
-    <Suspense fallback={<Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>}>
-      <Routes>
-        <Route path="/" element={<BandejaSolicitudes />} />
-        <Route path="/analitica" element={<ResumenAnalitico />} />
-      </Routes>
-    </Suspense>
+    <Box minHeight="100vh" sx={{ bgcolor: '#f5f7fb' }}>
+      <AppBar position="static" elevation={0} sx={{ bgcolor: '#102a43' }}>
+        <Toolbar sx={{ gap: 3 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>Softgic Solicitudes</Typography>
+          <Button component={Link} to="/" color="inherit">Bandeja</Button>
+          <Button component={Link} to="/analitica" color="inherit">Analítica</Button>
+          <Typography variant="body2" sx={{ display: { xs: 'none', md: 'block' } }}>{keycloak.tokenParsed?.preferred_username}</Typography>
+          <Button color="inherit" onClick={() => keycloak.logout({ redirectUri: window.location.origin })}>Salir</Button>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Suspense fallback={<Box display="flex" justifyContent="center" p={6}><CircularProgress aria-label="Cargando módulo" /></Box>}>
+          <Routes>
+            <Route path="/" element={<BandejaSolicitudes />} />
+            <Route path="/analitica" element={<ResumenAnalitico />} />
+          </Routes>
+        </Suspense>
+      </Container>
+    </Box>
   );
 }
 

@@ -32,7 +32,7 @@ public class GestionarSupervisionService implements GestionarSupervisionUseCase 
         Solicitud solicitud = obtener(solicitudId);
         solicitud.devolverAAtencion(supervisorId, motivo);
         solicitudRepository.guardar(solicitud);
-        publicar("SolicitudDevueltaAAtencion", solicitudId, supervisorId, motivo);
+        publicar("SolicitudDevueltaAAtencion", solicitud, supervisorId, motivo);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class GestionarSupervisionService implements GestionarSupervisionUseCase 
         Solicitud solicitud = obtener(solicitudId);
         solicitud.cerrar(supervisorId, motivo);
         solicitudRepository.guardar(solicitud);
-        publicar("SolicitudCerrada", solicitudId, supervisorId, motivo);
+        publicar("SolicitudCerrada", solicitud, supervisorId, motivo);
     }
 
     private Solicitud obtener(UUID solicitudId) {
@@ -49,15 +49,17 @@ public class GestionarSupervisionService implements GestionarSupervisionUseCase 
                 .orElseThrow(() -> new NoSuchElementException("Solicitud no encontrada: " + solicitudId));
     }
 
-    private void publicar(String tipo, UUID solicitudId, UUID actorId, String motivo) {
+        private void publicar(String tipo, Solicitud solicitud, UUID actorId, String motivo) {
         try {
             String payload = objectMapper.writeValueAsString(new SupervisionPayload(
-                    solicitudId.toString(), actorId.toString(), motivo));
-            eventPublisher.publicar(DomainEvent.of(tipo, solicitudId.toString(), UUID.randomUUID().toString(), payload));
+                solicitud.getId().toString(), solicitud.getCategoriaId().toString(), actorId.toString(),
+                solicitud.getEstado().name(), motivo));
+            eventPublisher.publicar(DomainEvent.of(tipo, solicitud.getId().toString(), UUID.randomUUID().toString(), payload));
         } catch (Exception e) {
             throw new IllegalStateException("No fue posible serializar el evento " + tipo, e);
         }
     }
 
-    private record SupervisionPayload(String solicitudId, String actorId, String motivo) {}
+    private record SupervisionPayload(String solicitudId, String categoriaId, String actorId, String estado,
+                                      String motivo) {}
 }

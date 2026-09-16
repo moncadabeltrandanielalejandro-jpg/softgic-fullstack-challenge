@@ -1,4 +1,5 @@
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
+import { rspack } from '@rspack/core';
 import { defineConfig } from '@rspack/cli';
 import path from 'path';
 
@@ -33,18 +34,20 @@ export default defineConfig({
     uniqueName: 'mfeSolicitudes',
   },
   plugins: [
+    new rspack.HtmlRspackPlugin({ template: './public/index.html' }),
     new ModuleFederationPlugin({
       name: 'mfeSolicitudes',
+      dts: false,
       filename: 'remoteEntry.js',
       exposes: {
         './BandejaSolicitudes': './src/pages/BandejaSolicitudes',
         './ResumenAnalitico': './src/pages/ResumenAnalitico',
       },
       shared: {
-        react: { singleton: true, requiredVersion: '^19.0.0' },
-        'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
-        'react-redux': { singleton: true },
-        '@reduxjs/toolkit': { singleton: true },
+        react: { singleton: true, eager: true, requiredVersion: '^19.0.0' },
+        'react-dom': { singleton: true, eager: true, requiredVersion: '^19.0.0' },
+        'react-redux': { singleton: true, eager: true },
+        '@reduxjs/toolkit': { singleton: true, eager: true },
       },
     }),
   ],

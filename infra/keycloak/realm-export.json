@@ -35,6 +35,8 @@
   "users": [
     {
       "username": "solicitante.demo",
+      "firstName": "Solicitante",
+      "lastName": "Demo",
       "enabled": true,
       "email": "solicitante.demo@example.local",
       "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
@@ -42,6 +44,8 @@
     },
     {
       "username": "analista.demo",
+      "firstName": "Analista",
+      "lastName": "Demo",
       "enabled": true,
       "email": "analista.demo@example.local",
       "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
@@ -49,6 +53,8 @@
     },
     {
       "username": "supervisor.demo",
+      "firstName": "Supervisor",
+      "lastName": "Demo",
       "enabled": true,
       "email": "supervisor.demo@example.local",
       "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
