@@ -1,0 +1,58 @@
+{
+  "realm": "softgic-solicitudes",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "SOLICITANTE", "description": "Registra y consulta sus solicitudes" },
+      { "name": "ANALISTA", "description": "Atiende y resuelve solicitudes" },
+      { "name": "SUPERVISOR", "description": "Consulta todas, devuelve y cierra" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "solicitudes-shell",
+      "name": "Shell frontend (Authorization Code + PKCE)",
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "solicitudes-service",
+      "name": "Resource server (backend)",
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "solicitante.demo",
+      "enabled": true,
+      "email": "solicitante.demo@example.local",
+      "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
+      "realmRoles": ["SOLICITANTE"]
+    },
+    {
+      "username": "analista.demo",
+      "enabled": true,
+      "email": "analista.demo@example.local",
+      "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
+      "realmRoles": ["ANALISTA"]
+    },
+    {
+      "username": "supervisor.demo",
+      "enabled": true,
+      "email": "supervisor.demo@example.local",
+      "credentials": [{ "type": "password", "value": "Demo_2026!", "temporary": false }],
+      "realmRoles": ["SUPERVISOR"]
+    }
+  ]
+}

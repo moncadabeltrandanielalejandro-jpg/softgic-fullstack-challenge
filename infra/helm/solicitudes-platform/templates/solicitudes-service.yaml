@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solicitudes-service
+spec:
+  replicas: {{ .Values.solicitudesService.replicaCount }}
+  selector:
+    matchLabels: { app: solicitudes-service }
+  template:
+    metadata:
+      labels: { app: solicitudes-service }
+    spec:
+      containers:
+        - name: solicitudes-service
+          image: "{{ .Values.solicitudesService.image.repository }}:{{ .Values.solicitudesService.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.solicitudesService.port }}
+          envFrom:
+            - configMapRef: { name: solicitudes-platform-config }
+          env:
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ .Values.secrets.dbPasswordSecretName }}, key: password }
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: {{ .Values.solicitudesService.port }} }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: {{ .Values.solicitudesService.port }} }
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.solicitudesService.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solicitudes-service
+spec:
+  selector: { app: solicitudes-service }
+  ports:
+    - port: {{ .Values.solicitudesService.port }}
+      targetPort: {{ .Values.solicitudesService.port }}

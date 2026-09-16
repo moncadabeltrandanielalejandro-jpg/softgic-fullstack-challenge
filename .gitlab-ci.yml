@@ -1,0 +1,101 @@
+stages:
+  - lint
+  - test
+  - coverage
+  - build
+  - package
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+# --- Backend ---
+backend:lint:
+  stage: lint
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - cd backend && mvn -q -B validate
+  rules:
+    - changes: ["backend/**/*"]
+
+backend:test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - cd backend && mvn -B test
+  artifacts:
+    when: always
+    reports:
+      junit: backend/*/target/surefire-reports/TEST-*.xml
+  rules:
+    - changes: ["backend/**/*"]
+
+backend:coverage:
+  stage: coverage
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - cd backend && mvn -B verify -DskipTests=false
+  artifacts:
+    paths:
+      - backend/*/target/site/jacoco/
+  rules:
+    - changes: ["backend/**/*"]
+
+backend:build-images:
+  stage: build
+  image: docker:26
+  services: ["docker:26-dind"]
+  script:
+    - docker build -t solicitudes-service:$CI_COMMIT_SHORT_SHA -f backend/solicitudes-service/Dockerfile .
+    - docker build -t indicadores-service:$CI_COMMIT_SHORT_SHA -f backend/indicadores-service/Dockerfile .
+  rules:
+    - changes: ["backend/**/*"]
+
+# --- Frontend ---
+frontend:lint-test:
+  stage: test
+  image: node:20
+  script:
+    - cd frontend/shell && npm ci && npm run test
+    - cd ../mfe-solicitudes && npm ci && npm run test
+  rules:
+    - changes: ["frontend/**/*"]
+
+frontend:build:
+  stage: build
+  image: node:20
+  script:
+    - cd frontend/shell && npm ci && npm run build
+    - cd ../mfe-solicitudes && npm ci && npm run build
+  artifacts:
+    paths:
+      - frontend/shell/dist/
+      - frontend/mfe-solicitudes/dist/
+  rules:
+    - changes: ["frontend/**/*"]
+
+# --- Karate (contrato/E2E transversal) ---
+karate:test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - cd backend/karate-tests && mvn -B test
+  rules:
+    - changes: ["backend/**/*"]
+
+# --- Helm ---
+helm:validate:
+  stage: package
+  image: alpine/helm:3.15.4
+  script:
+    - helm lint infra/helm/solicitudes-platform
+    - helm template infra/helm/solicitudes-platform > /dev/null
+  rules:
+    - changes: ["infra/helm/**/*"]
+
+# Despliegue real queda como etapa manual, no exigida por el reto.
+deploy:manual:
+  stage: package
+  image: alpine/helm:3.15.4
+  script:
+    - echo "Etapa manual: helm upgrade --install solicitudes infra/helm/solicitudes-platform -f values-<ambiente>.yaml"
+  when: manual

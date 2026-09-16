@@ -1,0 +1,26 @@
+solicitudesService:
+  image:
+    repository: solicitudes-service
+    tag: latest
+  replicaCount: 1
+  port: 8081
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+indicadoresService:
+  image:
+    repository: indicadores-service
+    tag: latest
+  replicaCount: 1
+  port: 8082
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+config:
+  kafkaBootstrapServers: "kafka:9092"
+  keycloakIssuerUri: "http://keycloak:8080/realms/softgic-solicitudes"
+
+secrets:
+  dbPasswordSecretName: "solicitudes-db-secret"

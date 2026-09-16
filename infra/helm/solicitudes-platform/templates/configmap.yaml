@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solicitudes-platform-config
+data:
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
+  KEYCLOAK_ISSUER_URI: {{ .Values.config.keycloakIssuerUri | quote }}
