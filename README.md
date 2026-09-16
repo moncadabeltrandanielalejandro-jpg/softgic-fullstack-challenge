@@ -39,7 +39,7 @@ Prerrequisitos: Docker + Docker Compose, JDK 25, Node 20+, pnpm/npm.
 docker compose up --build
 ```
 
-Esto levanta: SQL Server, Kafka (+ Zookeeper/KRaft), Keycloak, `solicitudes-service`, `indicadores-service`. El frontend se ejecuta aparte durante desarrollo (ver [frontend/README.md](frontend/README.md)).
+Esto levanta todo el stack: SQL Server, Kafka (+ Zookeeper/KRaft), Keycloak, `solicitudes-service`, `indicadores-service`, el shell y el microfrontend. Abre `http://localhost:3000` para usar la aplicación. Keycloak está disponible en `http://localhost:8080`, y las APIs en `http://localhost:8081` y `http://localhost:8082`.
 
 Variables de entorno de ejemplo en [`.env.example`](.env.example). Usuarios de prueba documentados en [infra/keycloak/README.md](infra/keycloak/README.md).
 

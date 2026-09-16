@@ -103,5 +103,19 @@ services:
     ports:
       - "8082:8082"
 
+  mfe-solicitudes:
+    build:
+      context: ./frontend/mfe-solicitudes
+    ports:
+      - "3001:3001"
+
+  shell:
+    build:
+      context: ./frontend/shell
+    depends_on:
+      - mfe-solicitudes
+    ports:
+      - "3000:3000"
+
 volumes:
   sqlserver-data:
